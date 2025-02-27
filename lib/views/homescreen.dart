@@ -28,88 +28,116 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Optionally, you can remove the AppBar if not needed
       appBar: AppBar(
-        title: Text('Currency Exchange'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () async {
-              await _controller.refreshExchangeRate();
-              setState(() {}); // Update the UI after refreshing data
-            },
-          ),
-        ],
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Display the current currency pair
-              Text(
-                '${_model.baseCurrency} to ${_model.targetCurrency}',
-                style: TextStyle(fontSize: 24),
-              ),
-              SizedBox(height: 20),
-              // Display the exchange rate or a loading indicator
-              _model.exchangeRate != null
-                  ? Text(
-                _model.exchangeRate!.toStringAsFixed(2),
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-              )
-                  : CircularProgressIndicator(),
-              SizedBox(height: 20),
-              // Display the last updated time if available
-              if (_model.lastUpdated != null)
-                Text(
-                  'Last updated: ${_model.lastUpdated!.toLocal()}',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-              SizedBox(height: 40),
-              // Bonus: Dropdown menus to allow the user to change the currency pair
-              Row(
+      body: Container(
+        // Use BoxDecoration to add a background gradient
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.amber.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            // SingleChildScrollView ensures content is scrollable on smaller devices.
+            child: SingleChildScrollView(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Dropdown for the base currency
-                  DropdownButton<String>(
-                    value: _model.baseCurrency,
-                    items: currencies.map((String currency) {
-                      return DropdownMenuItem(
-                        value: currency,
-                        child: Text(currency),
-                      );
-                    }).toList(),
-                    onChanged: (String? newBase) async {
-                      if (newBase != null) {
-                        // Use the controller to update the currency pair and refresh data
-                        _controller.updateCurrencyPair(newBase, _model.targetCurrency);
-                        await _controller.refreshExchangeRate();
-                        setState(() {});
-                      }
-                    },
+                  // Big golden dollar sign at the top
+                  Icon(
+                    Icons.attach_money,
+                    size: 100,
+                    color: Colors.amber,
                   ),
-                  SizedBox(width: 20),
-                  // Dropdown for the target currency
-                  DropdownButton<String>(
-                    value: _model.targetCurrency,
-                    items: currencies.map((String currency) {
-                      return DropdownMenuItem(
-                        value: currency,
-                        child: Text(currency),
-                      );
-                    }).toList(),
-                    onChanged: (String? newTarget) async {
-                      if (newTarget != null) {
-                        _controller.updateCurrencyPair(_model.baseCurrency, newTarget);
-                        await _controller.refreshExchangeRate();
-                        setState(() {});
-                      }
+                  SizedBox(height: 16),
+                  // "Currency Exchange" text
+                  Text(
+                    'Currency Exchange',
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 16),
+                  // Refresh button placed under the title
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _controller.refreshExchangeRate();
+                      setState(() {});
                     },
+                    child: Icon(Icons.refresh),
+                  ),
+                  SizedBox(height: 30),
+                  // Display the current currency pair
+                  Text(
+                    '${_model.baseCurrency} to ${_model.targetCurrency}',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  SizedBox(height: 20),
+                  // Display the exchange rate or a loading indicator
+                  _model.exchangeRate != null
+                      ? Text(
+                    _model.exchangeRate!.toStringAsFixed(2),
+                    style: TextStyle(
+                        fontSize: 40, fontWeight: FontWeight.bold),
+                  )
+                      : CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  // Display the last updated time if available
+                  if (_model.lastUpdated != null)
+                    Text(
+                      'Last updated: ${_model.lastUpdated!.toLocal()}',
+                      style:
+                      TextStyle(fontSize: 14, color: Colors.green[600]),
+                    ),
+                  SizedBox(height: 40),
+                  // Dropdown menus to allow the user to change the currency pair
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Dropdown for the base currency
+                      DropdownButton<String>(
+                        value: _model.baseCurrency,
+                        items: currencies.map((String currency) {
+                          return DropdownMenuItem(
+                            value: currency,
+                            child: Text(currency),
+                          );
+                        }).toList(),
+                        onChanged: (String? newBase) async {
+                          if (newBase != null) {
+                            _controller.updateCurrencyPair(newBase, _model.targetCurrency);
+                            await _controller.refreshExchangeRate();
+                            setState(() {});
+                          }
+                        },
+                      ),
+                      SizedBox(width: 20),
+                      // Dropdown for the target currency
+                      DropdownButton<String>(
+                        value: _model.targetCurrency,
+                        items: currencies.map((String currency) {
+                          return DropdownMenuItem(
+                            value: currency,
+                            child: Text(currency),
+                          );
+                        }).toList(),
+                        onChanged: (String? newTarget) async {
+                          if (newTarget != null) {
+                            _controller.updateCurrencyPair(_model.baseCurrency, newTarget);
+                            await _controller.refreshExchangeRate();
+                            setState(() {});
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
