@@ -55,3 +55,4 @@ app.*.map.json
 .env
 .env.*
 lib/secrets.dart
+lib/config/api_config.dart
